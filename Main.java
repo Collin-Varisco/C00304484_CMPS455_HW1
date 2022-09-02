@@ -8,73 +8,56 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 public class Main {
-
-
     public static int T; // Number of threads
     public static int S; // Number of times each thread should shout
 
-    public static void inputMethod(boolean tValid){
-        Scanner threadInput = new Scanner(System.in);
-        boolean tV = false;
-        if(!tValid){
-            System.out.print("Enter the number of threads: ");
-            try {
-                int tempT = threadInput.nextInt();
-                if(tempT > 0 && tempT <= 10000000) {
-                    T = tempT;
-                } else {
-                    inputMethod(false);
-                }
-            } catch (Exception ex) {
-                inputMethod(false);
+
+    /* getT()
+     * Collects user input for how many threads should be created.
+     * Minimum of 1 thread, maximum of 10000000 threads.
+     * The value is stored in the global variable T.
+     */
+    public static void getT() {
+        Scanner scan = new Scanner(System.in);
+        System.out.print("Enter the number of threads: ");
+        try {
+            T = scan.nextInt();
+            if(T < 1 || T > 10000000) {
+                getT();
             }
-            tV = true;
+        } catch (Exception ex) {
+            getT();
         }
-        if(tV || tValid) {
-            System.out.print("How many times should each thread shout?: ");
-            try {
-                int tempS = threadInput.nextInt();
-                if (tempS > 0 && tempS <= 100) {
-                    S = tempS;
-                } else {
-                    inputMethod(true);
-                }
-            } catch (Exception ex) {
-                inputMethod(true);
+    }
+
+    /* getS()
+     * Collects user input for how many times each thread should shout.
+     * The value is stored in the global variable S.
+     */
+    public static void getS() {
+        Scanner scan = new Scanner(System.in);
+        System.out.print("How many times should each thread shout?: ");
+        try {
+            S = scan.nextInt();
+            if(S < 1 || S > 100) {
+                getS();
             }
+        } catch (Exception ex) {
+            getS();
         }
     }
 
     public static void main(String[] args) {
-        inputMethod(false);
+        getT(); // User inputs threads
+        getS(); // User inputs shouts
 
         Thread[] threads = new Thread[T];
 
         for (int i = 0; i < T; i++) {
             threads[i] = new Thread(new Shout(i));
         }
-        ArrayList<Integer> threadIDs = new ArrayList<Integer>();
-        int[] runCount = new int[T];
-        for (int i = 0; i < T; i++) { runCount[i] = 0;}
-
-        boolean finished = false;
-        while(!finished){
-            int randomId = new Random().nextInt(T);
-            if(runCount[randomId] < S) {
-                if (!threadIDs.contains(randomId)) {
-                    threadIDs.add(randomId);
-                    threads[randomId].start();
-                    runCount[randomId]++;
-                } else {
-                    threads[randomId].run();
-                    runCount[randomId]++;
-                }
-            }
-            boolean allFinished = true;
-            for(int c : runCount) {
-                if (c != S) { allFinished = false; }
-            }
-            finished = allFinished;
+        for(Thread t: threads) {
+            t.start();
         }
     }
 }

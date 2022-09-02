@@ -2,6 +2,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Shout implements Runnable {
+    Thread t;
+    private boolean exit;
+    public int threadShoutTotal;
+
+    Shout(int id) {
+        t = new Thread(this, "Thread "+id+".) ");
+        exit = false;
+        t.start();
+    }
+
     // 15 Randomly generated sentences stored in an array
     String[] sentences = {
             "They looked up at the sky and saw a million stars.",
@@ -21,22 +31,27 @@ public class Shout implements Runnable {
             "The tour bus was packed with teenage girls heading toward their next adventure."
     };
 
-    public int threadID;
-    public int threadShoutTotal;
-    public Shout(){ }
 
-    public Shout(int threadNum){ threadID = threadNum; }
-
+    /* Run()
+     * Shout random sentences for the specified amount of times given by the user.
+     */
     @Override
     public void run() {
-        if(threadShoutTotal == Main.S){
-            Thread.currentThread().stop();
-        } else {
-            int randomIndex = 15;
-            System.out.println("Thread " + this.threadID + ".) " + sentences[new Random().nextInt(randomIndex)]);
-            threadShoutTotal++;
-
+        while(!exit) {
+            if (threadShoutTotal < (Main.S - 1)) {
+                System.out.println(this.t.getName() + sentences[new Random().nextInt(15)]);
+                threadShoutTotal++;
+                int randInt = new Random().nextInt(3, 6);
+                for (int i = 0; i < randInt; i++) {
+                    Thread.yield();
+                }
+            } else {
+                stop();
+            }
         }
+    }
 
+    public void stop(){
+        exit = true;
     }
 }
